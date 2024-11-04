@@ -1,0 +1,6 @@
+@ShopEasy.Ims.Api_HostAddress = http://localhost:5265
+
+GET {{ShopEasy.Ims.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
