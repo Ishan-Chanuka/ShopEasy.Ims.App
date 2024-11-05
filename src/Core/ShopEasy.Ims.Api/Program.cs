@@ -1,7 +1,10 @@
 using Microsoft.OpenApi.Models;
+using QuestPDF.Infrastructure;
 using ShopEasy.Ims.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 builder.Services.AddAuthenticationExtension(builder.Configuration);
 builder.Services.AddAuthorization();
