@@ -39,6 +39,7 @@ namespace ShopEasy.Ims.Infrastructure.Services
                     Price = request.Price,
                     QuantityInStock = request.QuantityInStock,
                     MinimumStock = request.MinimumStock,
+                    IsStockLow = (request.QuantityInStock <= request.MinimumStock ? true : false),
                     CreatedBy = request.UserId
                 };
 
@@ -122,7 +123,7 @@ namespace ShopEasy.Ims.Infrastructure.Services
                                              Price = p.Price,
                                              QuantityInStock = p.QuantityInStock,
                                              MinimumStock = p.MinimumStock,
-                                             StockStatus = p.QuantityInStock == 0 ? "Out of Stock" : (p.QuantityInStock <= p.MinimumStock ? "Low" : "Available")
+                                             StockStatus = p.QuantityInStock == 0 ? "Out of Stock" : (p.IsStockLow ? "Low" : "Available")
                                          }).ToListAsync();
 
             return new ApiResponse<IEnumerable<ProductResponseModel>>()
@@ -146,7 +147,7 @@ namespace ShopEasy.Ims.Infrastructure.Services
                                      Price = p.Price,
                                      QuantityInStock = p.QuantityInStock,
                                      MinimumStock = p.MinimumStock,
-                                     StockStatus = p.QuantityInStock == 0 ? "Out of Stock" : (p.QuantityInStock <= p.MinimumStock ? "Low" : "Available")
+                                     StockStatus = p.QuantityInStock == 0 ? "Out of Stock" : (p.IsStockLow ? "Low" : "Available")
                                  }).FirstOrDefaultAsync();
 
             return new ApiResponse<ProductResponseModel>()

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ShopEasy.Ims.Application.Services;
 using ShopEasy.Ims.Domain.Models.RequestModels;
 using ShopEasy.Ims.Domain.Models.ResponseModels;
@@ -31,7 +32,9 @@ namespace ShopEasy.Ims.Api.Controllers
             return Ok(product);
         }
 
+
         [HttpPost("")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         public async Task<ActionResult<ApiResponse<ProductResponseModel>>> CreateProduct(ProductRequestModel product)
         {
             var createdProduct = await _productsService.AddProductAsync(product);
@@ -39,6 +42,7 @@ namespace ShopEasy.Ims.Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         public async Task<ActionResult<ApiResponse<ProductResponseModel>>> UpdateProduct(int id, ProductRequestModel product)
         {
             var updatedProduct = await _productsService.UpdateProductAsync(id, product);
@@ -46,6 +50,7 @@ namespace ShopEasy.Ims.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         public async Task<ActionResult<ApiResponse<ProductResponseModel>>> DeleteProduct(int id)
         {
             var deletedProduct = await _productsService.DeleteProductAsync(id, 1);

@@ -30,6 +30,7 @@ namespace ShopEasy.Ims.Infrastructure
         public static void AddRepositoriesExtension(this IServiceCollection services)
         {
             services.AddScoped<IProductsService, ProductService>();
+            services.AddScoped<IAuthService, AuthService>();
         }
 
         public static void AddAuthenticationExtension(this IServiceCollection services, IConfiguration configuration)

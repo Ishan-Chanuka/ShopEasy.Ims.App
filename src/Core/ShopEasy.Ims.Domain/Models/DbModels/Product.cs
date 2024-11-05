@@ -26,6 +26,6 @@ namespace ShopEasy.Ims.Domain.Models.DbModels
 
         [Required]
         public int MinimumStock { get; set; }
-        public bool StockStatus => QuantityInStock > MinimumStock;
+        public bool IsStockLow { get; set; }
     }
 }
