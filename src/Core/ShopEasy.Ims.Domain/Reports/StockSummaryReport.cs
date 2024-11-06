@@ -1,18 +1,17 @@
 ﻿using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using ShopEasy.Ims.Domain.Models.DbModels;
+using ShopEasy.Ims.Domain.Models.ResponseModels;
 
 namespace ShopEasy.Ims.Domain.Reports
 {
-    public class ProductStockReport : IDocument
+    public class StockSummaryReport : IDocument
     {
-        private readonly string _title;
-        private readonly List<Product> _products;
+        private readonly StockSummaryResponseModel _products;
+        private const string _title = "Stock Summary Report";
 
-        public ProductStockReport(string title, List<Product> products)
+        public StockSummaryReport(StockSummaryResponseModel products)
         {
-            _title = title;
             _products = products;
         }
 
@@ -25,7 +24,7 @@ namespace ShopEasy.Ims.Domain.Reports
             {
                 page.Size(PageSizes.A4);
                 page.Margin(0.5f, Unit.Inch);
-                page.DefaultTextStyle(x => x.FontSize(12));
+                page.DefaultTextStyle(x => x.FontSize(12).FontColor(Colors.Black));
 
                 page.Header()
                     .Text(_title)
@@ -33,7 +32,32 @@ namespace ShopEasy.Ims.Domain.Reports
                     .FontSize(20)
                     .FontColor(Colors.Blue.Medium);
 
-                page.Content().PaddingVertical(0.3f, Unit.Centimetre).Element(ComposeTable);
+                page.Content().Column(column =>
+                {
+                    column.Item().Row(row =>
+                    {
+                        row.RelativeItem().Text($"Date: {DateTime.Now:d}");
+                    });
+
+                    column.Item().Row(row =>
+                    {
+                        row.RelativeItem().Text($"Total Items In Stock: {_products.TotalItemsInStock}");
+                    });
+
+                    column.Item().Row(row =>
+                    {
+                        row.RelativeItem().Text($"Total Value Of Items: {_products.TotalValueOfItems:F2}");
+                    });
+
+                    column.Item().Row(row =>
+                    {
+                        row.RelativeItem().Text($"Total Stock Quantity: {_products.StockItems.Sum(p => p.QuantityInStock)}");
+                    });
+
+                    column.Item().PaddingVertical(10);
+
+                    column.Item().Element(ComposeTable);
+                });
 
                 page.Footer()
                     .AlignCenter()
@@ -51,18 +75,16 @@ namespace ShopEasy.Ims.Domain.Reports
             {
                 table.ColumnsDefinition(columns =>
                 {
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
+                    columns.RelativeColumn(2);  // Product Name
+                    columns.RelativeColumn();   // Quantity
+                    columns.RelativeColumn();   // Price
+                    columns.RelativeColumn();   // Stock status
                 });
 
                 table.Header(header =>
                 {
-                    header.Cell().Element(CellStyle).Text("Item Name").FontSize(12).SemiBold();
+                    header.Cell().Element(CellStyle).Text("Product Name").FontSize(12).SemiBold();
                     header.Cell().Element(CellStyle).Text("Quantity").FontSize(12).SemiBold();
-                    header.Cell().Element(CellStyle).Text("Minimum Stcok").FontSize(12).SemiBold();
                     header.Cell().Element(CellStyle).Text("Price").FontSize(12).SemiBold();
                     header.Cell().Element(CellStyle).Text("Stock Status").FontSize(12).SemiBold();
 
@@ -76,12 +98,11 @@ namespace ShopEasy.Ims.Domain.Reports
                     }
                 });
 
-                foreach (var item in _products)
+                foreach (var item in _products.StockItems)
                 {
-                    table.Cell().Element(CellStyle).Text(item.Name);
+                    table.Cell().Element(CellStyle).Text(item.ProductName);
                     table.Cell().Element(CellStyle).Text(item.QuantityInStock.ToString());
-                    table.Cell().Element(CellStyle).Text(item.MinimumStock.ToString());
-                    table.Cell().Element(CellStyle).Text($"LKR {item.Price:F2}");
+                    table.Cell().Element(CellStyle).Text($"LKR {item.Price.ToString()}");
                     table.Cell().Element(CellStyle).Text(item.QuantityInStock == 0 ? "Out of stock" : (item.QuantityInStock > item.MinimumStock ? "Available in stock" : "Low in stock"));
 
                     static IContainer CellStyle(IContainer container)
@@ -92,6 +113,13 @@ namespace ShopEasy.Ims.Domain.Reports
                             .Padding(5)
                             .AlignCenter();
                     }
+                }
+
+                static IContainer TotalCellStyle(IContainer container)
+                {
+                    return container
+                        .Padding(5)
+                        .AlignCenter();
                 }
             });
         }

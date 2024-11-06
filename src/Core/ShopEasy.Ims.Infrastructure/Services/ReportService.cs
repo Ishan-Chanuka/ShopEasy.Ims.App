@@ -1,5 +1,6 @@
 ﻿using ShopEasy.Ims.Application.Services;
 using ShopEasy.Ims.Domain.Models.DbModels;
+using ShopEasy.Ims.Domain.Models.ResponseModels;
 using ShopEasy.Ims.Domain.Reports;
 using ShopEasy.Ims.Infrastructure.Context;
 
@@ -58,8 +59,20 @@ namespace ShopEasy.Ims.Infrastructure.Services
 
         public Task<byte[]> GenerateProductSummaryReportAsync()
         {
-            var products = GetProducts().OrderBy(p => p.Name).ToList();
-            var document = new ProductSummaryReport(products);
+            var products = GetProducts().OrderBy(p => p.Name).Select(p => new StockSummaryResponseModel
+            {
+                TotalItemsInStock = GetProducts().Count(),
+                TotalValueOfItems = GetProducts().Sum(p => p.QuantityInStock * p.Price),
+                StockItems = GetProducts().Select(p => new StockItemResponseModel
+                {
+                    ProductName = p.Name,
+                    Price = p.Price,
+                    QuantityInStock = p.QuantityInStock,
+                    MinimumStock = p.MinimumStock
+                }).ToList()
+            }).FirstOrDefault();
+
+            var document = new StockSummaryReport(products);
 
             using Stream stream = new MemoryStream();
             document.GeneratePdf(stream);
