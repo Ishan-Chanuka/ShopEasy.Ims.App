@@ -7,7 +7,6 @@ using Microsoft.IdentityModel.Tokens;
 using ShopEasy.Ims.Application.Services;
 using ShopEasy.Ims.Domain.Models.DbModels;
 using ShopEasy.Ims.Infrastructure.Context;
-using ShopEasy.Ims.Infrastructure.Seeds;
 using ShopEasy.Ims.Infrastructure.Services;
 using System.Text;
 
@@ -31,6 +30,8 @@ namespace ShopEasy.Ims.Infrastructure
         {
             services.AddScoped<IProductsService, ProductService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IReportService, ReportService>();
+            services.AddTransient<ISeeder, Seeder>();
         }
 
         public static void AddAuthenticationExtension(this IServiceCollection services, IConfiguration configuration)
@@ -64,12 +65,7 @@ namespace ShopEasy.Ims.Infrastructure
 
         public static void AddSeedersExtension(this IServiceCollection services)
         {
-            var userManager = services.BuildServiceProvider().GetRequiredService<UserManager<ApplicationUser>>();
-            var roleManager = services.BuildServiceProvider().GetRequiredService<RoleManager<ApplicationRole>>();
-
-            SeedUserRole.SeedAsync(roleManager).Wait();
-            SeedDefaultAdmin.SeedAsync(userManager).Wait();
-            SeedDefaultEmployee.SeedAsync(userManager).Wait();
+            services.AddScoped<ISeeder, Seeder>();
         }
     }
 }

@@ -18,6 +18,7 @@ namespace ShopEasy.Ims.Api.Controllers
             _productsService = productsService;
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin,Employee")]
         [HttpGet("")]
         public async Task<ActionResult<ApiResponse<IEnumerable<ProductResponseModel>>>> GetProducts()
         {
@@ -25,6 +26,7 @@ namespace ShopEasy.Ims.Api.Controllers
             return Ok(products);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin,Employee")]
         [HttpGet("{id}")]
         public async Task<ActionResult<ApiResponse<ProductResponseModel>>> GetProduct(int id)
         {
@@ -32,25 +34,24 @@ namespace ShopEasy.Ims.Api.Controllers
             return Ok(product);
         }
 
-
-        [HttpPost("")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+        [HttpPost("")]
         public async Task<ActionResult<ApiResponse<ProductResponseModel>>> CreateProduct(ProductRequestModel product)
         {
             var createdProduct = await _productsService.AddProductAsync(product);
             return Ok(createdProduct);
         }
 
-        [HttpPut("{id}")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+        [HttpPut("{id}")]
         public async Task<ActionResult<ApiResponse<ProductResponseModel>>> UpdateProduct(int id, ProductRequestModel product)
         {
             var updatedProduct = await _productsService.UpdateProductAsync(id, product);
             return Ok(updatedProduct);
         }
 
-        [HttpDelete("{id}")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult<ApiResponse<ProductResponseModel>>> DeleteProduct(int id)
         {
             var deletedProduct = await _productsService.DeleteProductAsync(id, 1);

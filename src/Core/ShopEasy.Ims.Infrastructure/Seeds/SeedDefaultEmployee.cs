@@ -20,7 +20,7 @@ namespace ShopEasy.Ims.Infrastructure.Seeds
             if (userManager.Users.All(u => u.Id != defaultUser.Id))
             {
                 await userManager.CreateAsync(defaultUser, "Employee@123");
-                await userManager.AddToRoleAsync(defaultUser, UserRole.Admin.ToString());
+                await userManager.AddToRoleAsync(defaultUser, UserRole.Employee.ToString());
             }
         }
     }

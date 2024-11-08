@@ -1,7 +1,11 @@
 using Microsoft.OpenApi.Models;
+using QuestPDF.Infrastructure;
+using ShopEasy.Ims.Application.Services;
 using ShopEasy.Ims.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 builder.Services.AddAuthenticationExtension(builder.Configuration);
 builder.Services.AddAuthorization();
@@ -40,9 +44,14 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddDatabaseExtension(builder.Configuration);
 builder.Services.AddRepositoriesExtension();
-builder.Services.AddSeedersExtension();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<ISeeder>();
+    await seeder.SeedAsync();
+}
 
 if (app.Environment.IsDevelopment())
 {
