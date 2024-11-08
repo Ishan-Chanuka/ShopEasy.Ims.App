@@ -73,3 +73,4 @@ Authenticate via the `/login `endpoint to retrieve a JWT token, which you can th
 - SQL Server
 - Swagger/OpenAPI
 - JWT Authentication
+- QuestPDF
